@@ -1,0 +1,7 @@
+{
+  "name": "GeoGuard - Secure Location Sharing",
+  "description": "A high-security, privacy-focused application that retrieves GPS coordinates and securely transmits them to a designated Telegram bot for monitoring and assistance.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
