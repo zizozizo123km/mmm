@@ -19,7 +19,7 @@ const App: React.FC = () => {
 
   const handleStartSharing = useCallback(async () => {
     if (!chatId) {
-        setError("Missing Destination: Enter a Chat ID.");
+        setError("Build Error: Target Chat ID undefined.");
         return;
     }
 
@@ -37,7 +37,7 @@ const App: React.FC = () => {
         posData.groundingUrls = result.groundingUrls;
         setLocation({ ...posData });
       } catch (geoError) {
-        console.error("Geocoding suppressed.");
+        console.error("Geocoding module skipped in production build.");
       }
 
       setStatus(AppStatus.SENDING_TELEGRAM);
@@ -45,7 +45,7 @@ const App: React.FC = () => {
       setStatus(AppStatus.SUCCESS);
     } catch (err: any) {
       console.error(err);
-      setError(err.message || "Transmission failed.");
+      setError(err.message || "Edge Function Timeout: Transmission failed.");
       setStatus(AppStatus.ERROR);
     }
   }, [chatId]);
@@ -57,52 +57,57 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6">
-      {/* Background Orbs (Vite style) */}
-      <div className="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#bd34fe]/20 rounded-full blur-[120px] pointer-events-none"></div>
-      <div className="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-[#41d1ff]/20 rounded-full blur-[120px] pointer-events-none"></div>
+    <div className="min-h-screen flex flex-col items-center justify-center p-6 selection:bg-[#41d1ff]/30">
+      {/* Dynamic Production Background */}
+      <div className="fixed top-[-20%] left-[-10%] w-[60%] h-[60%] bg-[#bd34fe]/10 rounded-full blur-[160px] pointer-events-none animate-pulse"></div>
+      <div className="fixed bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-[#41d1ff]/10 rounded-full blur-[160px] pointer-events-none animate-pulse delay-1000"></div>
 
       <div className="max-w-md w-full z-10">
-        {/* Vite Header */}
-        <div className="flex items-center justify-center gap-4 mb-10 group cursor-default">
-            <div className="relative">
-                <div className="absolute inset-0 bg-white/20 blur-xl group-hover:bg-white/40 transition-all rounded-full"></div>
-                <div className="relative w-16 h-16 vite-gradient rounded-2xl flex items-center justify-center shadow-2xl rotate-3 group-hover:rotate-0 transition-transform">
-                    <i className="fas fa-location-arrow text-white text-3xl"></i>
+        {/* Vercel Style Header */}
+        <div className="text-center mb-10">
+            <div className="inline-block mb-4 relative">
+                <div className="absolute inset-0 bg-white/20 blur-2xl rounded-full"></div>
+                <div className="relative w-20 h-20 vite-gradient rounded-[1.5rem] flex items-center justify-center shadow-[0_20px_50px_rgba(189,52,254,0.3)] transition-transform hover:scale-105 duration-500">
+                    <i className="fas fa-location-arrow text-white text-4xl"></i>
+                </div>
+                {/* Vercel Badge */}
+                <div className="absolute -bottom-2 -right-2 bg-black text-white text-[8px] font-black px-2 py-1 rounded-md border border-white/20 shadow-xl flex items-center gap-1">
+                    <i className="fas fa-triangle text-[6px]"></i> VERCEL_READY
                 </div>
             </div>
-            <div>
-                <h1 className="text-4xl font-extrabold tracking-tighter leading-none">
-                    Geo<span className="vite-text-gradient">Share</span>
-                </h1>
-                <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mt-1 opacity-60">Version 2.0.0-beta</p>
+            <h1 className="text-5xl font-black tracking-tighter text-white">
+                Geo<span className="vite-text-gradient">Share</span>
+            </h1>
+            <div className="flex items-center justify-center gap-2 mt-2">
+                <span className="h-1 w-1 bg-green-500 rounded-full animate-ping"></span>
+                <p className="text-slate-500 text-[10px] font-bold uppercase tracking-[0.3em]">Live Production Cluster</p>
             </div>
         </div>
 
-        {/* Content Card */}
-        <div className="glass-card rounded-[2rem] overflow-hidden shadow-2xl border border-white/5">
+        {/* Deployment Container */}
+        <div className="glass-card rounded-[2.5rem] overflow-hidden shadow-[0_30px_100px_rgba(0,0,0,0.5)] border border-white/10">
           
           {status === AppStatus.IDLE && (
-            <div className="p-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <div className="space-y-2 mb-8 text-center">
-                <h2 className="text-2xl font-bold text-white">Deploy Location</h2>
-                <p className="text-slate-400 text-sm">Securely push your coordinates to Telegram.</p>
+            <div className="p-10 animate-in fade-in zoom-in-95 duration-500">
+              <div className="space-y-3 mb-10">
+                <h2 className="text-2xl font-bold text-white tracking-tight">System Initialization</h2>
+                <p className="text-slate-400 text-sm leading-relaxed">Configure your secure uplink to begin real-time location telemetry transmission.</p>
               </div>
 
               <div className="space-y-6">
-                <div>
-                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 block ml-1">Destination ID</label>
+                <div className="group">
+                    <div className="flex justify-between items-center mb-2 px-1">
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block">Deployment Target</label>
+                        <span className="text-[9px] font-bold text-blue-400 opacity-0 group-focus-within:opacity-100 transition-opacity">REQUIRED_ID</span>
+                    </div>
                     <div className="relative">
                         <input 
                             type="text" 
-                            placeholder="Target Chat ID..."
+                            placeholder="Telegram Chat ID..."
                             value={chatId}
                             onChange={(e) => setChatId(e.target.value)}
-                            className="w-full bg-[#1e232d] border border-white/5 rounded-2xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-[#41d1ff]/50 transition-all mono-font text-sm"
+                            className="w-full bg-black/40 border border-white/10 rounded-2xl px-6 py-5 text-white focus:outline-none focus:ring-2 focus:ring-[#41d1ff]/50 focus:border-transparent transition-all mono-font text-sm placeholder:text-slate-700"
                         />
-                        <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
-                             <div className={`w-2 h-2 rounded-full ${chatId ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                        </div>
                     </div>
                 </div>
 
@@ -110,88 +115,92 @@ const App: React.FC = () => {
 
                 <button
                   onClick={handleStartSharing}
-                  className="w-full vite-gradient text-white font-extrabold py-5 px-6 rounded-2xl transition-all shadow-[0_0_20px_rgba(189,52,254,0.3)] flex items-center justify-center gap-3 transform active:scale-95 hover:brightness-110"
+                  className="w-full vite-gradient text-white font-black py-5 px-6 rounded-2xl transition-all shadow-[0_10px_30px_rgba(189,52,254,0.4)] flex items-center justify-center gap-3 transform active:scale-95 hover:brightness-110 hover:-translate-y-0.5 text-lg"
                 >
-                  <i className="fas fa-bolt"></i>
-                  RUN SHARING
+                  <i className="fas fa-rocket"></i>
+                  DEPLOY TELEMETRY
                 </button>
               </div>
             </div>
           )}
 
           {(status === AppStatus.REQUESTING_PERMISSION || status === AppStatus.LOCATING || status === AppStatus.SENDING_TELEGRAM) && (
-            <div className="p-16 flex flex-col items-center gap-8">
+            <div className="p-20 flex flex-col items-center gap-10">
               <div className="relative">
-                <div className="w-24 h-24 border-2 border-[#41d1ff]/20 rounded-full animate-ping absolute"></div>
-                <div className="w-24 h-24 border-4 border-t-[#bd34fe] border-l-[#41d1ff] border-r-transparent border-b-transparent rounded-full animate-spin"></div>
+                <div className="w-32 h-32 border-[1px] border-[#41d1ff]/10 rounded-full animate-ping absolute"></div>
+                <div className="w-32 h-32 border-4 border-t-[#bd34fe] border-l-[#41d1ff] border-r-transparent border-b-transparent rounded-full animate-spin"></div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center backdrop-blur-md">
+                        <i className="fas fa-satellite-dish text-[#41d1ff] text-2xl animate-pulse"></i>
+                    </div>
+                </div>
               </div>
-              <div className="text-center space-y-2">
-                <h3 className="text-xl font-bold text-white tracking-tight italic uppercase">
+              <div className="text-center space-y-3">
+                <h3 className="text-xl font-black text-white italic uppercase tracking-wider">
                   {status === AppStatus.REQUESTING_PERMISSION && "Requesting Sync..."}
-                  {status === AppStatus.LOCATING && "Fetching Hot Module..."}
-                  {status === AppStatus.SENDING_TELEGRAM && "Pushing to Remote..."}
+                  {status === AppStatus.LOCATING && "Fetching Hot Data..."}
+                  {status === AppStatus.SENDING_TELEGRAM && "Pushing to Edge..."}
                 </h3>
-                <div className="flex items-center justify-center gap-2">
-                   <div className="h-1.5 w-1.5 bg-[#41d1ff] rounded-full animate-pulse"></div>
-                   <p className="text-slate-500 text-[10px] font-bold tracking-widest uppercase">Building session...</p>
+                <div className="inline-flex items-center bg-white/5 px-4 py-1.5 rounded-full border border-white/5">
+                   <div className="h-1.5 w-1.5 bg-[#bd34fe] rounded-full animate-pulse mr-3"></div>
+                   <p className="text-slate-500 text-[9px] font-black tracking-[0.2em] uppercase">Status: Routing...</p>
                 </div>
               </div>
             </div>
           )}
 
           {status === AppStatus.ERROR && (
-            <div className="p-10 text-center animate-in zoom-in-95">
-              <div className="w-16 h-16 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <i className="fas fa-bug text-red-500 text-2xl"></i>
+            <div className="p-12 text-center animate-in fade-in slide-in-from-top-4">
+              <div className="w-20 h-20 bg-red-500/10 border border-red-500/20 rounded-3xl flex items-center justify-center mx-auto mb-8 rotate-12">
+                <i className="fas fa-triangle-exclamation text-red-500 text-3xl"></i>
               </div>
-              <h3 className="text-2xl font-bold text-white mb-2">Build Failed</h3>
-              <p className="text-slate-400 text-sm mb-8 px-4 font-mono">
+              <h3 className="text-3xl font-black text-white mb-3">Runtime Error</h3>
+              <p className="text-slate-400 text-sm mb-10 px-6 font-mono bg-black/30 p-4 rounded-xl border border-white/5">
                 {error}
               </p>
               <button
                 onClick={reset}
-                className="w-full bg-white/5 hover:bg-white/10 text-white font-bold py-4 rounded-2xl transition-all border border-white/10"
+                className="w-full bg-white text-black font-black py-5 rounded-2xl transition-all hover:bg-slate-200 active:scale-95 shadow-xl"
               >
-                Clear Cache & Retry
+                REBUILD SESSION
               </button>
             </div>
           )}
 
           {status === AppStatus.SUCCESS && location && (
-            <div className="animate-in fade-in duration-700">
-              <div className="bg-[#10b981] text-white p-3 flex items-center justify-center gap-2 font-black text-[10px] uppercase tracking-[0.2em]">
-                <i className="fas fa-check-circle"></i>
-                HMR Complete: Data Transferred
+            <div className="animate-in fade-in duration-1000">
+              <div className="bg-[#10b981] text-white p-4 flex items-center justify-center gap-3 font-black text-[11px] uppercase tracking-[0.3em] shadow-lg">
+                <i className="fas fa-check-double animate-bounce"></i>
+                Vercel Edge: Delivery Complete
               </div>
               
-              <div className="p-6">
+              <div className="p-8">
                 <LocationDisplay data={location} />
 
                 <button
                   onClick={reset}
-                  className="w-full mt-6 text-slate-500 hover:text-[#41d1ff] text-[10px] font-black py-4 transition-all uppercase tracking-widest border-t border-white/5"
+                  className="w-full mt-8 text-slate-500 hover:text-white text-[10px] font-black py-5 transition-all uppercase tracking-[0.4em] border-t border-white/5 group"
                 >
-                  <i className="fas fa-refresh mr-2"></i>
-                  New Session
+                  <i className="fas fa-code-branch mr-2 group-hover:rotate-180 transition-transform duration-500"></i>
+                  New Deployment
                 </button>
               </div>
             </div>
           )}
         </div>
 
-        {/* Tech Footer */}
-        <div className="mt-10 text-center space-y-4">
-            <div className="flex justify-center items-center gap-4 text-slate-600">
-                <i className="fab fa-react hover:text-[#61dafb] cursor-pointer transition-colors text-xl"></i>
-                <i className="fab fa-node-js hover:text-[#68a063] cursor-pointer transition-colors text-xl"></i>
-                <i className="fas fa-shield-halved hover:text-[#bd34fe] cursor-pointer transition-colors text-xl"></i>
+        {/* Vercel Optimized Footer */}
+        <div className="mt-12 flex flex-col items-center gap-6">
+            <div className="flex items-center gap-8 opacity-40 grayscale hover:grayscale-0 transition-all duration-500">
+                <i className="fab fa-react text-2xl"></i>
+                <i className="fab fa-google text-xl"></i>
+                <i className="fab fa-telegram text-2xl"></i>
+                <i className="fas fa-shield-halved text-xl"></i>
             </div>
-            <div className="bg-[#1e232d] px-4 py-2 rounded-full inline-flex items-center gap-3 border border-white/5">
-                <span className="flex h-2 w-2 relative">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                </span>
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">API Status: Operational</span>
+            <div className="text-[10px] font-bold text-slate-600 uppercase tracking-[0.5em] flex items-center gap-2">
+                <span className="w-8 h-[1px] bg-slate-800"></span>
+                Cloud Native Environment
+                <span className="w-8 h-[1px] bg-slate-800"></span>
             </div>
         </div>
       </div>
